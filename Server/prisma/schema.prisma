@@ -10,8 +10,9 @@ datasource db {
 model User {
   id            String    @id @default(uuid())
   phone         String    @unique
+  password      String    // hashed password
   name          String?
-  encryptedData String?   // encrypted personal data (optional)
+  encryptedData String?   // additional encrypted personal data (optional)
   trustScore    Float     @default(0)
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
@@ -28,10 +29,10 @@ model Agreement {
   borrowerId      String
   amount          Float
   dueDate         DateTime
-  status          Status   @default(PENDING) // PENDING, ACTIVE, COMPLETED, DEFAULTED
-  encryptedDetails String? // encrypted agreement terms
-  hash            String?  // SHA-256 hash of agreement (plaintext)
-  hederaTxId      String?  // Hedera transaction ID for the hash submission
+  status          Status   @default(PENDING)
+  encryptedDetails String? // encrypted terms
+  hash            String?  // SHA-256 hash of agreement plaintext
+  hederaTxId      String?  // Hedera transaction ID
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
 
