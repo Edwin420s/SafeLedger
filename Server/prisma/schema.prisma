@@ -1,0 +1,59 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            String    @id @default(uuid())
+  phone         String    @unique
+  name          String?
+  encryptedData String?   // encrypted personal data (optional)
+  trustScore    Float     @default(0)
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  // Relations
+  lentAgreements   Agreement[] @relation("Lender")
+  borrowedAgreements Agreement[] @relation("Borrower")
+  payments         Payment[]
+}
+
+model Agreement {
+  id              String   @id @default(uuid())
+  lenderId        String
+  borrowerId      String
+  amount          Float
+  dueDate         DateTime
+  status          Status   @default(PENDING) // PENDING, ACTIVE, COMPLETED, DEFAULTED
+  encryptedDetails String? // encrypted agreement terms
+  hash            String?  // SHA-256 hash of agreement (plaintext)
+  hederaTxId      String?  // Hedera transaction ID for the hash submission
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  lender User @relation("Lender", fields: [lenderId], references: [id])
+  borrower User @relation("Borrower", fields: [borrowerId], references: [id])
+  payments Payment[]
+}
+
+model Payment {
+  id          String   @id @default(uuid())
+  agreementId String
+  amount      Float
+  date        DateTime @default(now())
+  notes       String?
+  createdAt   DateTime @default(now())
+
+  agreement Agreement @relation(fields: [agreementId], references: [id])
+}
+
+enum Status {
+  PENDING
+  ACTIVE
+  COMPLETED
+  DEFAULTED
+}
