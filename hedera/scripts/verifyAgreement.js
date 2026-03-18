@@ -1,19 +1,14 @@
-// scripts/verifyAgreement.js
-// Interact with deployed AgreementVerification contract to store/verify hashes
 const { Client, ContractCallQuery, ContractExecuteTransaction, ContractId, Hbar } = require('@hashgraph/sdk');
 const path = require('path');
 require('dotenv').config({ path: path.join(__dirname, '../../.env') });
 
-// Replace with your deployed contract ID
-const CONTRACT_ID = process.env.CONTRACT_ID || "0.0.12345"; // update after deployment
+const CONTRACT_ID = process.env.CONTRACT_ID || "0.0.12345";
 
 async function storeHash(hashHex) {
     const client = Client.forTestnet();
     client.setOperator(process.env.HEDERA_ACCOUNT_ID, process.env.HEDERA_PRIVATE_KEY);
 
     const contractId = ContractId.fromString(CONTRACT_ID);
-
-    // Convert hex string to bytes32
     const bytes32 = Buffer.from(hashHex, 'hex');
 
     const tx = new ContractExecuteTransaction()
@@ -29,7 +24,6 @@ async function storeHash(hashHex) {
 
 async function verifyHash(hashHex) {
     const client = Client.forTestnet();
-    // No operator needed for query (but you may need to set operator for testnet)
     client.setOperator(process.env.HEDERA_ACCOUNT_ID, process.env.HEDERA_PRIVATE_KEY);
 
     const contractId = ContractId.fromString(CONTRACT_ID);
@@ -50,7 +44,6 @@ async function verifyHash(hashHex) {
     return { exists, timestamp };
 }
 
-// Example usage (if run directly)
 if (require.main === module) {
     const args = process.argv.slice(2);
     const command = args[0];

@@ -52,7 +52,7 @@ const Login = () => {
             className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 mb-3 leading-tight focus:outline-none focus:shadow-outline"
             id="password"
             type="password"
-            placeholder="********"
+            placeholder="******************"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             required
@@ -60,14 +60,17 @@ const Login = () => {
         </div>
         <div className="flex items-center justify-between">
           <button
-            className={`bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}
+            className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
             type="submit"
             disabled={loading}
           >
-            {loading ? 'Logging in...' : 'Sign In'}
+            {loading ? 'Signing In...' : 'Sign In'}
           </button>
-          <Link to="/register" className="inline-block align-baseline font-bold text-sm text-blue-600 hover:text-blue-800">
-            Create Account
+          <Link
+            className="inline-block align-baseline font-bold text-sm text-blue-500 hover:text-blue-800"
+            to="/register"
+          >
+            Don't have an account? Register
           </Link>
         </div>
       </form>

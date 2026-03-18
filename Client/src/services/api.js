@@ -1,4 +1,3 @@
-// API service for SafeLedger backend integration
 const API_BASE_URL = process.env.REACT_APP_API_BASE_URL || 'http://localhost:5000/api';
 
 const apiRequest = async (endpoint, options = {}) => {
@@ -28,7 +27,6 @@ export const login = async (phone, password) => {
     body: JSON.stringify({ phone, password }),
   });
   
-  // Store token for future requests
   if (response.token) {
     localStorage.setItem('safeledger_token', response.token);
   }
@@ -42,7 +40,6 @@ export const register = async (userData) => {
     body: JSON.stringify(userData),
   });
   
-  // Store token for future requests
   if (response.token) {
     localStorage.setItem('safeledger_token', response.token);
   }

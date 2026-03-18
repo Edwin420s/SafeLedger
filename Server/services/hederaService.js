@@ -7,12 +7,8 @@ const {
 const hederaClient = require('../config/hedera');
 const logger = require('../utils/logger');
 
-// Use environment variable for topic ID or create on first use
 let topicId = process.env.HEDERA_TOPIC_ID ? process.env.HEDERA_TOPIC_ID : null;
 
-/**
- * Create a new topic for storing hashes (run once at setup)
- */
 async function createTopic() {
   try {
     const tx = new TopicCreateTransaction();
@@ -21,7 +17,6 @@ async function createTopic() {
     topicId = receipt.topicId.toString();
     logger.info(`Hedera topic created: ${topicId}`);
     
-    // Save to environment for next restart
     console.log(`Please add this to your .env file: HEDERA_TOPIC_ID=${topicId}`);
     
     return topicId;
@@ -31,15 +26,9 @@ async function createTopic() {
   }
 }
 
-/**
- * Submit a hash to the topic
- * @param {string} hash - SHA-256 hash of agreement
- * @returns {string} transaction ID
- */
 async function submitHash(hash) {
   try {
     if (!topicId) {
-      // For demo, create topic on first use
       topicId = await createTopic();
     }
     const tx = new TopicMessageSubmitTransaction({
@@ -56,15 +45,9 @@ async function submitHash(hash) {
   }
 }
 
-/**
- * Verify a hash exists on the topic (by querying recent messages)
- * @param {string} hash - hash to verify
- * @returns {boolean}
- */
 async function verifyHash(hash) {
   try {
     if (!topicId) return false;
-    // Query the last 50 messages for better reliability
     const query = new TopicMessageQuery()
       .setTopicId(topicId)
       .setLimit(50);

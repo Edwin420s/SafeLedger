@@ -1,72 +1,93 @@
-const prisma = require('../config/db');
-const bcrypt = require('bcryptjs');
+const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
-const { JWT_SECRET, JWT_EXPIRE } = require('../config/env');
+const prisma = require('../config/db');
 const { encrypt, decrypt } = require('../utils/encryption');
-const logger = require('../utils/logger');
+const { JWT_SECRET, JWT_EXPIRE } = require('../config/env');
 
-// Register new user
 async function registerUser(phone, password, name) {
-  // Check if user exists
-  const existing = await prisma.user.findUnique({ where: { phone } });
-  if (existing) {
-    throw new Error('User already exists');
+  const existingUser = await prisma.user.findUnique({ where: { phone } });
+  if (existingUser) {
+    throw new Error('User with this phone number already exists');
   }
 
   const hashedPassword = await bcrypt.hash(password, 10);
-  // Encrypt any personal data if needed (here just name)
-  const encryptedName = name ? encrypt(name) : null;
+  const encryptedName = encrypt(name);
 
   const user = await prisma.user.create({
     data: {
       phone,
       password: hashedPassword,
       encryptedData: encryptedName,
+      trustScore: 70,
     },
   });
 
-  return user;
+  const token = jwt.sign({ userId: user.id }, JWT_SECRET, { expiresIn: JWT_EXPIRE });
+
+  const userResponse = {
+    id: user.id,
+    phone: user.phone,
+    name: name,
+    trustScore: user.trustScore,
+    createdAt: user.createdAt,
+  };
+
+  return { user: userResponse, token };
 }
 
-// Login
 async function loginUser(phone, password) {
   const user = await prisma.user.findUnique({ where: { phone } });
   if (!user) {
-    throw new Error('Invalid credentials');
+    throw new Error('Invalid phone number or password');
   }
 
-  // Compare password (assuming we have password field)
-  const valid = await bcrypt.compare(password, user.password);
-  if (!valid) {
-    throw new Error('Invalid credentials');
+  const isValidPassword = await bcrypt.compare(password, user.password);
+  if (!isValidPassword) {
+    throw new Error('Invalid phone number or password');
   }
 
-  const token = jwt.sign(
-    { userId: user.id, phone: user.phone },
-    JWT_SECRET,
-    { expiresIn: JWT_EXPIRE }
-  );
+  const token = jwt.sign({ userId: user.id }, JWT_SECRET, { expiresIn: JWT_EXPIRE });
 
-  return { user, token };
+  const userResponse = {
+    id: user.id,
+    phone: user.phone,
+    name: user.encryptedData ? decrypt(user.encryptedData) : null,
+    trustScore: user.trustScore,
+    createdAt: user.createdAt,
+  };
+
+  return { user: userResponse, token };
 }
 
-// Get user profile
 async function getUserProfile(userId) {
   const user = await prisma.user.findUnique({
     where: { id: userId },
-    include: {
-      lentAgreements: true,
-      borrowedAgreements: true,
+    select: {
+      id: true,
+      phone: true,
+      encryptedData: true,
+      trustScore: true,
+      createdAt: true,
+      updatedAt: true,
     },
   });
-  if (!user) throw new Error('User not found');
 
-  // Decrypt name if present
-  if (user.encryptedData) {
-    user.name = decrypt(user.encryptedData);
+  if (!user) {
+    throw new Error('User not found');
   }
-  delete user.encryptedData;
-  return user;
+
+  return {
+    id: user.id,
+    phone: user.phone,
+    name: user.encryptedData ? decrypt(user.encryptedData) : null,
+    trustScore: user.trustScore,
+    createdAt: user.createdAt,
+    updatedAt: user.updatedAt,
+  };
 }
 
-module.exports = { registerUser, loginUser, getUserProfile };
+module.exports = {
+  registerUser,
+  loginUser,
+  getUserProfile,
+};

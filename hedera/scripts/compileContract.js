@@ -20,7 +20,6 @@ async function compileContract() {
         console.error('Solc warning:', stderr);
       }
       
-      // Extract bytecode from solc output
       const lines = stdout.split('\n');
       let bytecode = '';
       let inBinary = false;
@@ -39,7 +38,6 @@ async function compileContract() {
       }
       
       if (!bytecode) {
-        // Fallback: try to find bytecode after "Binary:" line
         const binaryIndex = stdout.indexOf('Binary:');
         if (binaryIndex !== -1) {
           const afterBinary = stdout.substring(binaryIndex + 7);

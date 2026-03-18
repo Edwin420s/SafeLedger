@@ -1,4 +1,4 @@
-import React, { useState, useContext } from 'react';
+import React, { useState } from 'react';
 import { createAgreement } from '../services/api';
 import { showSuccess, showError } from './NotificationToast';
 import { useUser } from '../context/UserContext';
@@ -6,7 +6,7 @@ import { useUser } from '../context/UserContext';
 const AgreementForm = ({ onAgreementCreated }) => {
   const { user } = useUser();
   const [formData, setFormData] = useState({
-    lenderId: user?.id || '', // This will be auto-filled from current user
+    lenderId: user?.id || '',
     borrowerId: '',
     amount: '',
     dueDate: '',
@@ -22,7 +22,6 @@ const AgreementForm = ({ onAgreementCreated }) => {
     e.preventDefault();
     setLoading(true);
     try {
-      // Auto-fill lenderId with current user's ID
       const agreementData = {
         ...formData,
         lenderId: user.id,
@@ -71,8 +70,7 @@ const AgreementForm = ({ onAgreementCreated }) => {
           id="amount"
           name="amount"
           type="number"
-          min="1"
-          placeholder="e.g. 5000"
+          placeholder="5000"
           value={formData.amount}
           onChange={handleChange}
           required
@@ -94,22 +92,21 @@ const AgreementForm = ({ onAgreementCreated }) => {
       </div>
       <div className="mb-6">
         <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="terms">
-          Terms / Conditions
+          Terms
         </label>
         <textarea
           className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
           id="terms"
           name="terms"
-          rows="3"
-          placeholder="e.g. Interest, repayment schedule..."
+          placeholder="Enter loan terms and conditions"
           value={formData.terms}
           onChange={handleChange}
-          required
+          rows="4"
         />
       </div>
       <div className="flex items-center justify-between">
         <button
-          className={`bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}
+          className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
           type="submit"
           disabled={loading}
         >

@@ -1,17 +1,12 @@
-const { Client, AccountId, PrivateKey } = require('@hashgraph/sdk');
-const env = require('./env');
+const { Client } = require('@hashgraph/sdk');
+const { HEDERA_NETWORK, HEDERA_ACCOUNT_ID, HEDERA_PRIVATE_KEY } = require('./env');
 
-let client;
+const client = HEDERA_NETWORK === 'mainnet' ? Client.forMainnet() : Client.forTestnet();
 
-if (env.HEDERA_ACCOUNT_ID && env.HEDERA_PRIVATE_KEY) {
-  const accountId = AccountId.fromString(env.HEDERA_ACCOUNT_ID);
-  const privateKey = PrivateKey.fromString(env.HEDERA_PRIVATE_KEY);
-
-  client = Client.forTestnet(); // or mainnet
-  client.setOperator(accountId, privateKey);
+if (HEDERA_ACCOUNT_ID && HEDERA_PRIVATE_KEY) {
+  client.setOperator(HEDERA_ACCOUNT_ID, HEDERA_PRIVATE_KEY);
 } else {
-  console.warn('Hedera credentials missing, using dummy client');
-  client = Client.forTestnet();
+  console.warn('Hedera credentials not found in environment variables');
 }
 
 module.exports = client;
