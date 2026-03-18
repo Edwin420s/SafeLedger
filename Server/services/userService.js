@@ -20,17 +20,10 @@ async function registerUser(phone, password, name) {
   const user = await prisma.user.create({
     data: {
       phone,
+      password: hashedPassword,
       encryptedData: encryptedName,
-      // We don't store password directly, we can create a separate Auth model, but for simplicity store password in user table? Better to separate.
-      // We'll store password in User model? For simplicity, add password field.
-      // But schema lacks password. We need to add password to schema.
-      // Let's adjust: add password field to User.
     },
   });
-
-  // For now, we'll assume password stored in User. We'll modify schema later.
-  // Actually we need to update schema. Let's add password to User model.
-  // We'll update schema.prisma later.
 
   return user;
 }

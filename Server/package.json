@@ -6,7 +6,10 @@
   "scripts": {
     "start": "node server.js",
     "dev": "nodemon server.js",
-    "migrate": "prisma migrate dev"
+    "migrate": "prisma migrate dev",
+    "setup": "node scripts/setup.js",
+    "compile": "node hedera/scripts/compileContract.js",
+    "deploy": "node hedera/scripts/deployContract.js"
   },
   "dependencies": {
     "@hashgraph/sdk": "^2.48.0",
