@@ -5,7 +5,7 @@ import { login as apiLogin } from '../services/api';
 import { showError, showSuccess } from '../components/NotificationToast';
 
 const Login = () => {
-  const [email, setEmail] = useState('');
+  const [phone, setPhone] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const { login } = useUser();
@@ -15,12 +15,12 @@ const Login = () => {
     e.preventDefault();
     setLoading(true);
     try {
-      const userData = await apiLogin(email, password);
+      const userData = await apiLogin(phone, password);
       login(userData);
       showSuccess('Logged in successfully!');
       navigate('/dashboard');
     } catch (err) {
-      showError(err.message || 'Login failed. Check your credentials.');
+      showError(err.message || 'Login failed. Check your phone and password.');
     } finally {
       setLoading(false);
     }
@@ -31,16 +31,16 @@ const Login = () => {
       <h2 className="text-2xl font-bold mb-6 text-center">Login to SafeLedger</h2>
       <form onSubmit={handleSubmit}>
         <div className="mb-4">
-          <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="email">
-            Email
+          <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="phone">
+            Phone Number
           </label>
           <input
             className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-            id="email"
-            type="email"
-            placeholder="your@email.com"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
+            id="phone"
+            type="tel"
+            placeholder="0712345678"
+            value={phone}
+            onChange={(e) => setPhone(e.target.value)}
             required
           />
         </div>

@@ -3,12 +3,11 @@ import { useUser } from '../context/UserContext';
 import { useNavigate, Link } from 'react-router-dom';
 import { register as apiRegister } from '../services/api';
 import { showError, showSuccess } from '../components/NotificationToast';
-import { validateEmail, validatePhone } from '../utils/validation';
+import { validatePhone } from '../utils/validation';
 
 const Register = () => {
   const [formData, setFormData] = useState({
     name: '',
-    email: '',
     phone: '',
     password: '',
     confirmPassword: '',
@@ -24,10 +23,6 @@ const Register = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     // Basic validation
-    if (!validateEmail(formData.email)) {
-      showError('Please enter a valid email.');
-      return;
-    }
     if (!validatePhone(formData.phone)) {
       showError('Please enter a valid Kenyan phone number (e.g., 0712345678).');
       return;
@@ -69,21 +64,6 @@ const Register = () => {
             type="text"
             placeholder="John Doe"
             value={formData.name}
-            onChange={handleChange}
-            required
-          />
-        </div>
-        <div className="mb-4">
-          <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="email">
-            Email
-          </label>
-          <input
-            className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-            id="email"
-            name="email"
-            type="email"
-            placeholder="your@email.com"
-            value={formData.email}
             onChange={handleChange}
             required
           />

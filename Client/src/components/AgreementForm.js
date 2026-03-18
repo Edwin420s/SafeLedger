@@ -1,10 +1,13 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 import { createAgreement } from '../services/api';
 import { showSuccess, showError } from './NotificationToast';
+import { useUser } from '../context/UserContext';
 
 const AgreementForm = ({ onAgreementCreated }) => {
+  const { user } = useUser();
   const [formData, setFormData] = useState({
-    borrowerName: '',
+    lenderId: user?.id || '', // This will be auto-filled from current user
+    borrowerId: '',
     amount: '',
     dueDate: '',
     terms: '',
