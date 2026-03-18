@@ -9,8 +9,8 @@ async function register(req, res, next) {
     if (error) return res.status(400).json({ error: error.details[0].message });
 
     const { phone, password, name } = req.body;
-    const user = await registerUser(phone, password, name);
-    res.status(201).json({ message: 'User registered', user });
+    const result = await registerUser(phone, password, name);
+    res.status(201).json({ message: 'User registered', user: result.user, token: result.token });
   } catch (err) {
     next(err);
   }

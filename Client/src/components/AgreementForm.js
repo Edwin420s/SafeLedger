@@ -9,6 +9,8 @@ const AgreementForm = ({ onAgreementCreated }) => {
     lenderId: user?.id || '',
     borrowerId: '',
     amount: '',
+    interestRate: '5.0',
+    penaltyRate: '2.0',
     dueDate: '',
     terms: '',
   });
@@ -22,22 +24,33 @@ const AgreementForm = ({ onAgreementCreated }) => {
     e.preventDefault();
     setLoading(true);
     try {
+      if (!user || !user.id) {
+        showError('User not authenticated. Please log in again.');
+        return;
+      }
+      
       const agreementData = {
         ...formData,
         lenderId: user.id,
+        amount: parseFloat(formData.amount), // Convert to number
       };
+      
+      console.log('Submitting agreement data:', agreementData);
       const newAgreement = await createAgreement(agreementData);
       showSuccess('Agreement created and anchored on Hedera!');
       onAgreementCreated?.(newAgreement);
       setFormData({ 
         lenderId: user.id,
         borrowerId: '', 
-        amount: '', 
+        amount: '',
+        interestRate: '5.0',
+        penaltyRate: '2.0',
         dueDate: '', 
         terms: '' 
       });
     } catch (err) {
-      showError('Failed to create agreement. Please try again.');
+      console.error('Agreement creation error:', err);
+      showError(err.message || 'Failed to create agreement. Please try again.');
     } finally {
       setLoading(false);
     }
@@ -55,11 +68,14 @@ const AgreementForm = ({ onAgreementCreated }) => {
           id="borrowerId"
           name="borrowerId"
           type="tel"
-          placeholder="Enter borrower's phone number"
+          placeholder="Enter borrower's phone number (e.g., 0712345678)"
           value={formData.borrowerId}
           onChange={handleChange}
           required
         />
+        <p className="text-xs text-gray-500 mt-1">
+          Note: The borrower must be a registered user with this phone number
+        </p>
       </div>
       <div className="mb-4">
         <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="amount">
@@ -76,6 +92,42 @@ const AgreementForm = ({ onAgreementCreated }) => {
           required
         />
       </div>
+      <div className="grid grid-cols-2 gap-4 mb-4">
+        <div>
+          <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="interestRate">
+            Interest Rate (%)
+          </label>
+          <input
+            className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+            id="interestRate"
+            name="interestRate"
+            type="number"
+            step="0.1"
+            min="0"
+            max="100"
+            value={formData.interestRate}
+            onChange={handleChange}
+            required
+          />
+        </div>
+        <div>
+          <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="penaltyRate">
+            Penalty Rate (%)
+          </label>
+          <input
+            className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+            id="penaltyRate"
+            name="penaltyRate"
+            type="number"
+            step="0.1"
+            min="0"
+            max="50"
+            value={formData.penaltyRate}
+            onChange={handleChange}
+            required
+          />
+        </div>
+      </div>
       <div className="mb-4">
         <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="dueDate">
           Due Date
@@ -85,6 +137,7 @@ const AgreementForm = ({ onAgreementCreated }) => {
           id="dueDate"
           name="dueDate"
           type="date"
+          min={new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString().split('T')[0]} // Minimum tomorrow
           value={formData.dueDate}
           onChange={handleChange}
           required

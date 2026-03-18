@@ -10,17 +10,15 @@ datasource db {
 model User {
   id            String    @id @default(uuid())
   phone         String    @unique
-  password      String    // hashed password
+  password      String
   name          String?
-  encryptedData String?   // additional encrypted personal data (optional)
+  encryptedData String?
   trustScore    Float     @default(0)
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
 
-  // Relations
   lentAgreements   Agreement[] @relation("Lender")
   borrowedAgreements Agreement[] @relation("Borrower")
-  payments         Payment[]
 }
 
 model Agreement {
@@ -28,16 +26,19 @@ model Agreement {
   lenderId        String
   borrowerId      String
   amount          Float
+  interestRate     Float    @default(5.0)    // Annual interest rate in %
+  penaltyRate     Float    @default(2.0)    // Monthly penalty rate in %
   dueDate         DateTime
   status          Status   @default(PENDING)
-  encryptedDetails String? // encrypted terms
-  hash            String?  // SHA-256 hash of agreement plaintext
-  hederaTxId      String?  // Hedera transaction ID
+  encryptedDetails String?
+  hash            String?
+  hederaTxId      String?
+  acceptedAt      DateTime?                   // When borrower accepted the agreement
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
 
-  lender User @relation("Lender", fields: [lenderId], references: [id])
-  borrower User @relation("Borrower", fields: [borrowerId], references: [id])
+  lender   User     @relation("Lender", fields: [lenderId], references: [id])
+  borrower User     @relation("Borrower", fields: [borrowerId], references: [id])
   payments Payment[]
 }
 
@@ -57,4 +58,5 @@ enum Status {
   ACTIVE
   COMPLETED
   DEFAULTED
+  REJECTED
 }

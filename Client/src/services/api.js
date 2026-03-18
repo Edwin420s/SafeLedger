@@ -15,6 +15,7 @@ const apiRequest = async (endpoint, options = {}) => {
 
   if (!response.ok) {
     const error = await response.json().catch(() => ({ error: 'Request failed' }));
+    console.error('API Error:', error);
     throw new Error(error.error || 'Request failed');
   }
 
@@ -71,6 +72,18 @@ export const getUserAgreements = async () => {
 export const getAgreementById = async (id) => {
   const response = await apiRequest(`/agreements/${id}`);
   return response;
+};
+
+export const acceptAgreement = async (id) => {
+  return apiRequest(`/agreements/${id}/accept`, {
+    method: 'PATCH',
+  });
+};
+
+export const rejectAgreement = async (id) => {
+  return apiRequest(`/agreements/${id}/reject`, {
+    method: 'PATCH',
+  });
 };
 
 export const verifyAgreement = async (id) => {

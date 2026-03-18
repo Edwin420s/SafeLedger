@@ -38,7 +38,8 @@ const Register = () => {
 
     setLoading(true);
     try {
-      const userData = await apiRegister(formData);
+      const { confirmPassword, ...userDataToSend } = formData;
+      const userData = await apiRegister(userDataToSend);
       login(userData);
       showSuccess('Registration successful!');
       navigate('/dashboard');

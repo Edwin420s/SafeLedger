@@ -6,7 +6,7 @@ const logger = require('../utils/logger');
 
 // Create a new agreement
 async function createAgreement(data, creatorId) {
-  const { lenderId, borrowerId, amount, dueDate, terms } = data;
+  const { lenderId, borrowerId, amount, interestRate = 5.0, penaltyRate = 2.0, dueDate, terms } = data;
 
   // If borrowerId is a phone number, find the user
   let actualBorrowerId = borrowerId;
@@ -26,6 +26,8 @@ async function createAgreement(data, creatorId) {
     lenderId: actualLenderId,
     borrowerId: actualBorrowerId,
     amount,
+    interestRate,
+    penaltyRate,
     dueDate,
     terms: terms || '',
     createdAt: new Date().toISOString(),
@@ -43,28 +45,71 @@ async function createAgreement(data, creatorId) {
   // Encrypt terms if present
   const encryptedTerms = terms ? encrypt(terms) : null;
 
-  const agreement = await prisma.agreement.create({
-    data: {
-      lenderId: actualLenderId,
-      borrowerId: actualBorrowerId,
-      amount,
-      dueDate: new Date(dueDate),
-      status: 'PENDING',
-      encryptedDetails: encryptedTerms,
-      hash,
-      hederaTxId,
-    },
-    include: {
-      lender: true,
-      borrower: true,
-    },
-  });
+  // Try to create with new fields first, fallback to old schema if it fails
+  let agreement;
+  try {
+    agreement = await prisma.agreement.create({
+      data: {
+        lenderId: actualLenderId,
+        borrowerId: actualBorrowerId,
+        amount,
+        interestRate,
+        penaltyRate,
+        dueDate: new Date(dueDate),
+        status: 'PENDING',
+        encryptedDetails: encryptedTerms,
+        hash,
+        hederaTxId,
+      },
+      include: {
+        lender: true,
+        borrower: true,
+      },
+    });
+  } catch (error) {
+    // If new fields don't exist, fallback to old schema
+    if (error.message.includes('interestRate') || error.message.includes('penaltyRate')) {
+      logger.warn('New fields not available, using old schema');
+      agreement = await prisma.agreement.create({
+        data: {
+          lenderId: actualLenderId,
+          borrowerId: actualBorrowerId,
+          amount,
+          dueDate: new Date(dueDate),
+          status: 'PENDING',
+          encryptedDetails: encryptedTerms,
+          hash,
+          hederaTxId,
+        },
+        include: {
+          lender: true,
+          borrower: true,
+        },
+      });
+      // Add the fields to the response object manually
+      agreement.interestRate = interestRate;
+      agreement.penaltyRate = penaltyRate;
+    } else {
+      throw error;
+    }
+  }
 
   // Decrypt terms for response
   if (agreement.encryptedDetails) {
     agreement.terms = decrypt(agreement.encryptedDetails);
   }
   delete agreement.encryptedDetails;
+  
+  // Decrypt user names
+  if (agreement.lender?.encryptedData) {
+    agreement.lender.name = decrypt(agreement.lender.encryptedData);
+  }
+  delete agreement.lender?.encryptedData;
+  
+  if (agreement.borrower?.encryptedData) {
+    agreement.borrower.name = decrypt(agreement.borrower.encryptedData);
+  }
+  delete agreement.borrower?.encryptedData;
 
   return agreement;
 }
@@ -81,6 +126,18 @@ async function getAgreementById(agreementId) {
     agreement.terms = decrypt(agreement.encryptedDetails);
   }
   delete agreement.encryptedDetails;
+  
+  // Decrypt user names
+  if (agreement.lender?.encryptedData) {
+    agreement.lender.name = decrypt(agreement.lender.encryptedData);
+  }
+  delete agreement.lender?.encryptedData;
+  
+  if (agreement.borrower?.encryptedData) {
+    agreement.borrower.name = decrypt(agreement.borrower.encryptedData);
+  }
+  delete agreement.borrower?.encryptedData;
+  
   return agreement;
 }
 
@@ -106,12 +163,23 @@ async function listUserAgreements(userId) {
     orderBy: { createdAt: 'desc' },
   });
 
-  // Decrypt terms for each
+  // Decrypt terms and user names for each
   agreements.forEach(ag => {
     if (ag.encryptedDetails) {
       ag.terms = decrypt(ag.encryptedDetails);
     }
     delete ag.encryptedDetails;
+    
+    // Decrypt user names
+    if (ag.lender?.encryptedData) {
+      ag.lender.name = decrypt(ag.lender.encryptedData);
+    }
+    delete ag.lender?.encryptedData;
+    
+    if (ag.borrower?.encryptedData) {
+      ag.borrower.name = decrypt(ag.borrower.encryptedData);
+    }
+    delete ag.borrower?.encryptedData;
   });
 
   return agreements;
