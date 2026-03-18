@@ -23,13 +23,13 @@ const LoanList = () => {
 
   const getStatusBadge = (status) => {
     switch (status) {
-      case 'active':
+      case 'ACTIVE':
         return <span className="bg-green-100 text-green-800 text-xs font-medium mr-2 px-2.5 py-0.5 rounded">Active</span>;
-      case 'pending':
+      case 'PENDING':
         return <span className="bg-yellow-100 text-yellow-800 text-xs font-medium mr-2 px-2.5 py-0.5 rounded">Pending</span>;
-      case 'defaulted':
+      case 'DEFAULTED':
         return <span className="bg-red-100 text-red-800 text-xs font-medium mr-2 px-2.5 py-0.5 rounded">Defaulted</span>;
-      case 'completed':
+      case 'COMPLETED':
         return <span className="bg-blue-100 text-blue-800 text-xs font-medium mr-2 px-2.5 py-0.5 rounded">Completed</span>;
       default:
         return <span className="bg-gray-100 text-gray-800 text-xs font-medium mr-2 px-2.5 py-0.5 rounded">{status}</span>;
@@ -54,7 +54,7 @@ const LoanList = () => {
           <div key={agreement.id} className="border rounded p-4 hover:shadow transition">
             <div className="flex justify-between items-start">
               <div>
-                <p className="font-semibold">{agreement.borrowerName}</p>
+                <p className="font-semibold">{agreement.borrower?.name || agreement.borrowerId}</p>
                 <p className="text-sm text-gray-600">KES {agreement.amount}</p>
                 <p className="text-xs text-gray-500">Due: {new Date(agreement.dueDate).toLocaleDateString()}</p>
                 <p className="text-xs text-gray-500 mt-1">Hedera Tx: {agreement.hederaTxId || 'Pending'}</p>

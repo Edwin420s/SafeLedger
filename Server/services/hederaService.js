@@ -7,8 +7,8 @@ const {
 const hederaClient = require('../config/hedera');
 const logger = require('../utils/logger');
 
-// We'll use a single topic for all agreement hashes (or create per user)
-let topicId = null;
+// Use environment variable for topic ID or create on first use
+let topicId = process.env.HEDERA_TOPIC_ID ? process.env.HEDERA_TOPIC_ID : null;
 
 /**
  * Create a new topic for storing hashes (run once at setup)
@@ -18,8 +18,12 @@ async function createTopic() {
     const tx = new TopicCreateTransaction();
     const response = await tx.execute(hederaClient);
     const receipt = await response.getReceipt(hederaClient);
-    topicId = receipt.topicId;
-    logger.info(`Hedera topic created: ${topicId.toString()}`);
+    topicId = receipt.topicId.toString();
+    logger.info(`Hedera topic created: ${topicId}`);
+    
+    // Save to environment for next restart
+    console.log(`Please add this to your .env file: HEDERA_TOPIC_ID=${topicId}`);
+    
     return topicId;
   } catch (error) {
     logger.error('Error creating Hedera topic:', error);
@@ -36,7 +40,7 @@ async function submitHash(hash) {
   try {
     if (!topicId) {
       // For demo, create topic on first use
-      await createTopic();
+      topicId = await createTopic();
     }
     const tx = new TopicMessageSubmitTransaction({
       topicId: topicId,
@@ -60,10 +64,10 @@ async function submitHash(hash) {
 async function verifyHash(hash) {
   try {
     if (!topicId) return false;
-    // Query the last 10 messages (simplified)
+    // Query the last 50 messages for better reliability
     const query = new TopicMessageQuery()
       .setTopicId(topicId)
-      .setLimit(10);
+      .setLimit(50);
     const messages = await query.execute(hederaClient);
     for (const msg of messages) {
       if (msg.contents.toString() === hash) {

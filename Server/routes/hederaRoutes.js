@@ -5,6 +5,6 @@ const authMiddleware = require('../middlewares/authMiddleware');
 const router = express.Router();
 
 router.use(authMiddleware);
-router.get('/verify/:id', verifyAgreement);
+router.post('/verify/:id', verifyAgreement);
 
 module.exports = router;

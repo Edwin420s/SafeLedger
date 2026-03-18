@@ -22,10 +22,21 @@ const AgreementForm = ({ onAgreementCreated }) => {
     e.preventDefault();
     setLoading(true);
     try {
-      const newAgreement = await createAgreement(formData);
+      // Auto-fill lenderId with current user's ID
+      const agreementData = {
+        ...formData,
+        lenderId: user.id,
+      };
+      const newAgreement = await createAgreement(agreementData);
       showSuccess('Agreement created and anchored on Hedera!');
       onAgreementCreated?.(newAgreement);
-      setFormData({ borrowerName: '', amount: '', dueDate: '', terms: '' });
+      setFormData({ 
+        lenderId: user.id,
+        borrowerId: '', 
+        amount: '', 
+        dueDate: '', 
+        terms: '' 
+      });
     } catch (err) {
       showError('Failed to create agreement. Please try again.');
     } finally {
@@ -37,16 +48,16 @@ const AgreementForm = ({ onAgreementCreated }) => {
     <form onSubmit={handleSubmit} className="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4">
       <h2 className="text-xl font-bold mb-4">Create New Loan Agreement</h2>
       <div className="mb-4">
-        <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="borrowerName">
-          Borrower Name
+        <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="borrowerId">
+          Borrower Phone Number
         </label>
         <input
           className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-          id="borrowerName"
-          name="borrowerName"
-          type="text"
-          placeholder="Enter borrower's name"
-          value={formData.borrowerName}
+          id="borrowerId"
+          name="borrowerId"
+          type="tel"
+          placeholder="Enter borrower's phone number"
+          value={formData.borrowerId}
           onChange={handleChange}
           required
         />

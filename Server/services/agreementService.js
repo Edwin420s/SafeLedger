@@ -8,11 +8,23 @@ const logger = require('../utils/logger');
 async function createAgreement(data, creatorId) {
   const { lenderId, borrowerId, amount, dueDate, terms } = data;
 
-  // Ensure creator is either lender or borrower? For now, any authenticated user can create.
+  // If borrowerId is a phone number, find the user
+  let actualBorrowerId = borrowerId;
+  if (borrowerId.match(/^[0-9+]{10,15}$/)) {
+    const borrower = await prisma.user.findUnique({ where: { phone: borrowerId } });
+    if (!borrower) {
+      throw new Error('Borrower not found with this phone number');
+    }
+    actualBorrowerId = borrower.id;
+  }
+
+  // Ensure creator is either lender or borrower
+  const actualLenderId = lenderId || creatorId;
+
   // Build plaintext object for hashing
   const agreementPlain = {
-    lenderId,
-    borrowerId,
+    lenderId: actualLenderId,
+    borrowerId: actualBorrowerId,
     amount,
     dueDate,
     terms: terms || '',
@@ -33,8 +45,8 @@ async function createAgreement(data, creatorId) {
 
   const agreement = await prisma.agreement.create({
     data: {
-      lenderId,
-      borrowerId,
+      lenderId: actualLenderId,
+      borrowerId: actualBorrowerId,
       amount,
       dueDate: new Date(dueDate),
       status: 'PENDING',
@@ -42,7 +54,17 @@ async function createAgreement(data, creatorId) {
       hash,
       hederaTxId,
     },
+    include: {
+      lender: true,
+      borrower: true,
+    },
   });
+
+  // Decrypt terms for response
+  if (agreement.encryptedDetails) {
+    agreement.terms = decrypt(agreement.encryptedDetails);
+  }
+  delete agreement.encryptedDetails;
 
   return agreement;
 }
