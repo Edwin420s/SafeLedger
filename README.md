@@ -2,6 +2,38 @@
 
 A blockchain-powered lending platform that brings trust and transparency to informal financial agreements using Hedera Consensus Service for immutable verification.
 
+## 🏆 Hedera Hello Future Apex Hackathon 2026
+
+**Track**: DeFi & Tokenization  
+**Prize Pool**: $250,000  
+**Submission Deadline**: March 23, 2026, 11:59 PM ET  
+
+### 🎯 Problem Statement
+Millions of people in Kenya and across Africa rely on informal financial systems (chamas, friends/family loans, SACCOs) but lack a trust infrastructure to support these relationships. This leads to:
+
+- No verifiable agreements (verbal/WhatsApp chats only)
+- No reputation system for borrowers
+- No enforcement mechanisms beyond social pressure
+- Fragmented financial data across platforms
+- High risk of defaults and relationship breakdowns
+
+### 💡 Solution Overview
+SafeLedger creates a **trust layer for informal finance** by:
+- **Immutable Agreement Storage**: SHA-256 hashes anchored on Hedera blockchain
+- **Cryptographic Verification**: Tamper-proof agreement integrity
+- **Trust Score System**: Reputation building through successful transactions
+- **Encrypted Data Storage**: AES-256 protection for sensitive information
+- **Mobile-First Design**: Phone-based authentication for accessibility
+
+### 🌍 Impact & Innovation
+- **Local Context**: Built for Kenyan market (KES currency, phone formats)
+- **Financial Inclusion**: Enables trust in underserved communities
+- **Blockchain Integration**: Real-world use of Hedera Consensus Service
+- **Scalable Architecture**: Ready for regional expansion
+- **Social Impact**: Reduces poverty cycles through credit access
+
+---
+
 ## Architecture
 
 - **Frontend**: React.js with Tailwind CSS
@@ -13,14 +45,30 @@ A blockchain-powered lending platform that brings trust and transparency to info
 
 ## Features
 
+### 🔐 Security & Trust
 - User registration/login with phone-based authentication
-- Create and manage loan agreements
 - SHA-256 hashing of agreements stored on Hedera
 - Agreement verification against blockchain records
-- Encrypted sensitive data storage
-- Trust score system
-- Payment tracking
+- Encrypted sensitive data storage (AES-256)
+- Trust score system based on transaction history
+
+### 💼 Loan Management
+- Create and manage loan agreements
+- Borrower acceptance/rejection workflow
+- Payment tracking with timestamps
+- Agreement status management (PENDING → ACTIVE → COMPLETED/DEFAULTED)
+
+### 🌐 Blockchain Integration
+- **Hedera Consensus Service**: Immutable hash storage
+- **Automatic Topic Creation**: Self-managing HCS topics
+- **Transaction Verification**: Real-time blockchain verification
+- **Error Handling**: Robust fallback mechanisms
+
+### 📱 User Experience
+- Mobile-responsive design
+- Phone number lookup for borrowers
 - Real-time notifications
+- Intuitive dashboard interface
 
 ## Prerequisites
 
@@ -29,7 +77,7 @@ A blockchain-powered lending platform that brings trust and transparency to info
 - Redis 6+
 - Hedera Testnet Account
 
-## Setup
+## Quick Start
 
 ### 1. Clone and Install
 
@@ -49,55 +97,36 @@ npm install
 ### 2. Database Setup
 
 ```bash
-# Create database
-createdb safeledger
+# Using Docker (recommended)
+cd Server
+docker-compose up -d
 
-# Run migrations
+# Or manual setup
+createdb safeledger
 cd Server
 npx prisma migrate dev
-
-# Seed data (optional)
 npm run setup
 ```
 
 ### 3. Environment Configuration
 
 #### Backend (.env)
-
 ```bash
 cd Server
 cp .env.example .env
-```
-
-```env
-PORT=5000
-NODE_ENV=development
-DATABASE_URL="postgresql://user:password@localhost:5432/safeledger"
-REDIS_URL="redis://localhost:6379"
-JWT_SECRET="your-secret-key"
-JWT_EXPIRE="7d"
-ENCRYPTION_KEY="your-32-character-encryption-key"
-HEDERA_NETWORK="testnet"
-HEDERA_ACCOUNT_ID="0.0.xxxxxx"
-HEDERA_PRIVATE_KEY="302e020100300506032b657004220420..."
-HEDERA_TOPIC_ID=""
+# Edit .env with your credentials
 ```
 
 #### Frontend (.env)
-
 ```bash
 cd Client
 cp .env.example .env
 ```
 
-```env
-REACT_APP_API_BASE_URL=http://localhost:5000/api
-```
-
 ### 4. Start Services
 
 ```bash
-# Start Redis
+# Start Redis and PostgreSQL (if not using Docker)
 redis-server
 
 # Start Backend
@@ -109,13 +138,10 @@ cd Client
 npm start
 ```
 
-## Usage
-
-1. **Register**: Create account with phone number
-2. **Login**: Authenticate with phone and password
-3. **Create Agreement**: Fill loan details and submit
-4. **Verify**: Check agreement integrity on Hedera
-5. **Manage**: Track payments and agreement status
+### 5. Access Application
+- Frontend: http://localhost:3000
+- Backend API: http://localhost:5000
+- API Documentation: http://localhost:5000/api-docs
 
 ## Hedera Integration
 
@@ -127,80 +153,192 @@ npm start
 4. Add to `.env` file
 
 ### Topic Management
-
 - First run automatically creates a consensus topic
 - Topic ID is logged - add to `.env` for persistence
 - All agreement hashes are stored on this topic
 
-## API Endpoints
+## API Documentation
 
-### Authentication
+### Interactive Documentation
+Visit http://localhost:5000/api-docs for interactive Swagger/OpenAPI documentation.
+
+### Key Endpoints
+
+#### Authentication
 - `POST /api/users/register` - Register user
 - `POST /api/users/login` - Login user
 - `GET /api/users/profile` - Get profile
 - `PUT /api/users/profile` - Update profile
 
-### Agreements
+#### Agreements
 - `POST /api/agreements` - Create agreement
 - `GET /api/agreements` - List user agreements
 - `GET /api/agreements/:id` - Get agreement details
 - `PATCH /api/agreements/:id/sign` - Sign agreement
+- `PATCH /api/agreements/:id/accept` - Accept agreement
+- `PATCH /api/agreements/:id/reject` - Reject agreement
 
-### Hedera
+#### Hedera
 - `POST /api/hedera/verify/:id` - Verify agreement on blockchain
 
-### Payments
+#### Payments
 - `POST /api/payments` - Record payment
 - `GET /api/payments/agreement/:id` - Get agreement payments
 
+## Testing
+
+### Backend Tests
+```bash
+cd Server
+npm test                    # Run all tests
+npm run test:watch         # Watch mode
+npm run test:coverage      # Coverage report
+```
+
+### Test Coverage
+- Unit tests for core services (hashing, encryption, validation)
+- Integration tests for API endpoints
+- Security tests for authentication and authorization
+- Hedera service mocking for reliable testing
+
 ## Security Features
 
-- **Encryption**: AES-256 for sensitive data
-- **Hashing**: SHA-256 for agreement integrity
-- **Authentication**: JWT tokens with expiration
-- **Rate Limiting**: Prevent API abuse
-- **Input Validation**: Joi schemas for all inputs
+### Encryption & Hashing
+- **AES-256-GCM**: Sensitive data encryption
+- **SHA-256**: Agreement integrity hashing
+- **bcrypt**: Password hashing
+- **JWT**: Secure authentication tokens
+
+### API Security
+- **Rate Limiting**: 100 requests/15 minutes
+- **Input Validation**: Joi schemas for all endpoints
+- **CORS**: Cross-origin request protection
+- **Helmet**: Security headers
+
+### Blockchain Security
+- **Immutability**: Once recorded, cannot be changed
+- **Cryptographic Proof**: Verifiable integrity
+- **Decentralization**: Hedera network validation
 
 ## Deployment
 
-### Backend (Production)
+### Production Deployment
 
+#### Backend
 ```bash
 cd Server
 npm run build
 npm start
 ```
 
-### Frontend (Production)
-
+#### Frontend
 ```bash
 cd Client
 npm run build
 # Deploy build/ folder to your web server
 ```
 
-## Testing
-
+#### Docker Deployment
 ```bash
-# Backend tests
 cd Server
-npm test
-
-# Frontend tests
-cd Client
-npm test
+docker-compose -f docker-compose.prod.yml up -d
 ```
 
-## License
+### Environment Variables
+- `NODE_ENV`: Set to 'production'
+- `DATABASE_URL`: Production PostgreSQL connection
+- `REDIS_URL`: Production Redis connection
+- `HEDERA_NETWORK`: Set to 'mainnet' for production
+- `JWT_SECRET`: Strong secret key
+- `ENCRYPTION_KEY`: 32-character encryption key
 
-MIT License - see LICENSE file
+## Performance Monitoring
+
+### Health Checks
+- `GET /health` - Application health status
+- `GET /api-docs` - API documentation
+- Database connection monitoring
+- Redis connection monitoring
+
+### Metrics
+- Request/response times
+- Error rates
+- Database query performance
+- Hedera transaction success rates
+
+## Development
+
+### Project Structure
+```
+SafeLedger/
+├── Client/                 # React frontend
+│   ├── src/
+│   │   ├── components/     # React components
+│   │   ├── pages/         # Page components
+│   │   ├── services/      # API services
+│   │   └── utils/         # Utility functions
+├── Server/                # Node.js backend
+│   ├── controllers/       # Route controllers
+│   ├── services/         # Business logic
+│   ├── routes/          # API routes
+│   ├── middlewares/     # Express middleware
+│   ├── utils/          # Utility functions
+│   ├── config/         # Configuration files
+│   └── tests/          # Test files
+├── docs/               # Documentation
+└── database/           # Database files
+```
+
+### Contributing
+1. Fork the repository
+2. Create a feature branch
+3. Make your changes
+4. Add tests for new functionality
+5. Run the test suite
+6. Submit a pull request
+
+## Hackathon Submission
+
+### Technical Stack
+- **Blockchain**: Hedera Consensus Service (HCS)
+- **Frontend**: React.js + Tailwind CSS
+- **Backend**: Node.js + Express
+- **Database**: PostgreSQL + Prisma ORM
+- **Security**: JWT, AES-256, SHA-256
+
+### Innovation Points
+- **Real-World Problem**: Addresses informal finance trust gap in Kenya
+- **Blockchain Integration**: Practical use of Hedera for immutability
+- **Mobile-First**: Phone-based authentication for accessibility
+- **Trust System**: Reputation building through blockchain verification
+- **Local Context**: Kenya-specific implementation
+
+### Impact Metrics
+- **Financial Inclusion**: Enables trust in underserved communities
+- **Risk Reduction**: Immutable agreements reduce disputes
+- **Credit Building**: Trust scores enable future financial access
+- **Scalability**: Architecture ready for regional expansion
+
+### Demo Features
+- Complete user registration and authentication
+- Agreement creation with Hedera hash anchoring
+- Blockchain verification interface
+- Payment tracking and management
+- Trust score system demonstration
 
 ## Support
 
 For issues and questions:
 - Create GitHub Issue
 - Email: support@safeledger.dev
+- Documentation: [User Guide](docs/USER_GUIDE.md)
 
-## Hackathon Submission
+## License
 
-Built for Hedera Hello Future Apex Hackathon 2026 - DeFi & Tokenization Track.
+MIT License - see LICENSE file
+
+---
+
+**Built for Hedera Hello Future Apex Hackathon 2026 - DeFi & Tokenization Track**
+
+🚀 **Bringing trust to informal finance, one blockchain transaction at a time**
