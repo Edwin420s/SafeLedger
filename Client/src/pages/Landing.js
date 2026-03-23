@@ -47,49 +47,8 @@ const Landing = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
-      {/* Navigation */}
-      <nav className="bg-white shadow-sm">
-        <div className="container mx-auto px-4 py-4">
-          <div className="flex justify-between items-center">
-            <div className="flex items-center space-x-2">
-              <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
-                <span className="text-white font-bold text-sm">SL</span>
-              </div>
-              <span className="text-xl font-bold text-gray-900">SafeLedger</span>
-            </div>
-            <div className="flex items-center space-x-4">
-              {user ? (
-                <>
-                  <Link
-                    to="/dashboard"
-                    className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"
-                  >
-                    Dashboard
-                  </Link>
-                </>
-              ) : (
-                <>
-                  <Link
-                    to="/login"
-                    className="text-gray-700 hover:text-blue-600 px-4 py-2 rounded-lg transition-colors"
-                  >
-                    Login
-                  </Link>
-                  <Link
-                    to="/register"
-                    className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"
-                  >
-                    Get Started
-                  </Link>
-                </>
-              )}
-            </div>
-          </div>
-        </div>
-      </nav>
-
       {/* Hero Section */}
-      <section className="py-20 px-4">
+      <section className="pt-12 pb-20 px-4">
         <div className="container mx-auto text-center">
           <div className="mb-8">
             <h1 className="text-5xl md:text-6xl font-bold text-gray-900 mb-6">
@@ -308,7 +267,7 @@ const Landing = () => {
               Get Started Free
             </Link>
             <Link
-              to="/dashboard"
+              to="/login"
               className="border-2 border-white text-white px-8 py-4 rounded-lg text-lg font-semibold hover:bg-white hover:text-blue-600 transition-all"
             >
               View Demo
@@ -317,46 +276,7 @@ const Landing = () => {
         </div>
       </section>
 
-      {/* Footer */}
-      <footer className="bg-gray-900 text-white py-12">
-        <div className="container mx-auto px-4">
-          <div className="grid md:grid-cols-4 gap-8">
-            <div>
-              <h3 className="text-lg font-semibold mb-4">SafeLedger</h3>
-              <p className="text-gray-400">
-                Building trust in informal finance through blockchain technology.
-              </p>
-            </div>
-            <div>
-              <h3 className="text-lg font-semibold mb-4">Product</h3>
-              <ul className="space-y-2 text-gray-400">
-                <li><Link to="/features" className="hover:text-white">Features</Link></li>
-                <li><Link to="/security" className="hover:text-white">Security</Link></li>
-                <li><Link to="/pricing" className="hover:text-white">Pricing</Link></li>
-              </ul>
-            </div>
-            <div>
-              <h3 className="text-lg font-semibold mb-4">Company</h3>
-              <ul className="space-y-2 text-gray-400">
-                <li><Link to="/about" className="hover:text-white">About</Link></li>
-                <li><Link to="/contact" className="hover:text-white">Contact</Link></li>
-                <li><Link to="/blog" className="hover:text-white">Blog</Link></li>
-              </ul>
-            </div>
-            <div>
-              <h3 className="text-lg font-semibold mb-4">Legal</h3>
-              <ul className="space-y-2 text-gray-400">
-                <li><Link to="/privacy" className="hover:text-white">Privacy Policy</Link></li>
-                <li><Link to="/terms" className="hover:text-white">Terms of Service</Link></li>
-              </ul>
-            </div>
-          </div>
-          <div className="border-t border-gray-800 mt-8 pt-8 text-center text-gray-400">
-            <p>&copy; 2026 SafeLedger. Built for Kenya with ❤️ using Hedera blockchain.</p>
-          </div>
-        </div>
-      </footer>
-    </div>
+      </div>
   );
 };
 

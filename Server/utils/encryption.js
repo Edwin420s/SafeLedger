@@ -2,9 +2,8 @@ const crypto = require('crypto');
 const env = require('../config/env');
 
 const ALGORITHM = 'aes-256-gcm';
-const KEY = Buffer.from(env.ENCRYPTION_KEY, 'utf8'); // ensure 32 bytes
+const KEY = Buffer.from(env.ENCRYPTION_KEY.padEnd(32, '0').slice(0, 32), 'utf8');
 
-// Encrypt text
 function encrypt(text) {
   const iv = crypto.randomBytes(16);
   const cipher = crypto.createCipheriv(ALGORITHM, KEY, iv);
@@ -14,7 +13,6 @@ function encrypt(text) {
   return `${iv.toString('hex')}:${authTag.toString('hex')}:${encrypted}`;
 }
 
-// Decrypt text
 function decrypt(encryptedText) {
   const [ivHex, authTagHex, encrypted] = encryptedText.split(':');
   const iv = Buffer.from(ivHex, 'hex');

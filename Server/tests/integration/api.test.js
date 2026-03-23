@@ -19,7 +19,7 @@ describe('API Integration Tests', () => {
       .send(userData);
 
     authToken = response.body.token;
-    userId = response.body.user.id;
+    userId = response.body.user?.id || response.body.userId;
   });
 
   afterAll(async () => {

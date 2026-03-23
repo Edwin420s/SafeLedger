@@ -10,7 +10,6 @@ const api = axios.create({
   },
 });
 
-// Request interceptor for auth token
 api.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem('safeledger_token');
@@ -24,7 +23,6 @@ api.interceptors.request.use(
   }
 );
 
-// Response interceptor for token handling
 api.interceptors.response.use(
   (response) => {
     if (response.data.token) {
@@ -62,7 +60,6 @@ export const updateProfile = async (profileData) => {
   return response.data;
 };
 
-// Agreement APIs
 export const getAgreements = async () => {
   const response = await api.get('/agreements');
   return response.data;
@@ -88,7 +85,6 @@ export const rejectAgreement = async (id) => {
   return response.data;
 };
 
-// Payment APIs
 export const getPayments = async (agreementId) => {
   const response = await api.get(`/payments/agreement/${agreementId}`);
   return response.data;
@@ -99,7 +95,6 @@ export const createPayment = async (paymentData) => {
   return response.data;
 };
 
-// Hedera APIs
 export const verifyAgreement = async (id) => {
   const response = await api.post(`/hedera/verify/${id}`);
   return response.data;
@@ -110,7 +105,6 @@ export const getHederaStatus = async () => {
   return response.data;
 };
 
-// User management
 export const logout = () => {
   localStorage.removeItem('safeledger_token');
   window.location.href = '/login';
@@ -118,8 +112,8 @@ export const logout = () => {
 
 export const getCurrentUser = async () => {
   const token = localStorage.getItem('safeledger_token');
-  if (!token) return null;  
-  
+  if (!token) return null;
+
   try {
     const response = await api.get('/users/profile');
     return response.data.user;
@@ -128,7 +122,6 @@ export const getCurrentUser = async () => {
   }
 };
 
-// Legacy API compatibility
 export const getUserAgreements = getAgreements;
 export const getAgreementById = getAgreement;
 

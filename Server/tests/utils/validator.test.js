@@ -51,7 +51,7 @@ describe('Validator Service', () => {
         amount: 5000,
         interestRate: 5.0,
         penaltyRate: 2.0,
-        dueDate: '2024-12-31T23:59:59.000Z',
+        dueDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(),
         terms: 'Loan terms and conditions'
       };
 
