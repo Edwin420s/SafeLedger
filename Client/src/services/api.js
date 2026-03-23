@@ -41,13 +41,42 @@ api.interceptors.response.use(
 
 // Auth APIs
 export const register = async (userData) => {
-  const response = await api.post('/users/register', userData);
-  return response.data;
+  try {
+    // Clean and validate the phone number before sending
+    const cleanedUserData = {
+      phone: userData.phone ? userData.phone.replace(/\s/g, '').replace(/"/g, '') : '',
+      password: userData.password,
+      name: userData.name
+    };
+    
+    console.log('Sending register request:', cleanedUserData);
+    const response = await api.post('/users/register', cleanedUserData);
+    return response.data;
+  } catch (error) {
+    console.error('Register API error:', error.response?.data || error.message);
+    throw error;
+  }
 };
 
 export const login = async (credentials) => {
-  const response = await api.post('/users/login', credentials);
-  return response.data;
+  try {
+    console.log('Raw credentials received:', credentials);
+    console.log('credentials.phone:', credentials.phone);
+    console.log('credentials.password:', credentials.password);
+    
+    // Clean and validate the phone number before sending
+    const cleanedCredentials = {
+      phone: credentials.phone ? credentials.phone.replace(/\s/g, '').replace(/"/g, '') : '',
+      password: credentials.password
+    };
+    
+    console.log('Sending login request:', cleanedCredentials);
+    const response = await api.post('/users/login', cleanedCredentials);
+    return response.data;
+  } catch (error) {
+    console.error('Login API error:', error.response?.data || error.message);
+    throw error;
+  }
 };
 
 export const getProfile = async () => {
@@ -71,8 +100,15 @@ export const getAgreement = async (id) => {
 };
 
 export const createAgreement = async (agreementData) => {
-  const response = await api.post('/agreements', agreementData);
-  return response.data;
+  try {
+    console.log('Creating agreement with data:', agreementData);
+    const response = await api.post('/agreements', agreementData);
+    console.log('Agreement created response:', response.data);
+    return response.data;
+  } catch (error) {
+    console.error('Create agreement API error:', error.response?.data || error.message);
+    throw error;
+  }
 };
 
 export const acceptAgreement = async (id) => {
@@ -116,7 +152,7 @@ export const getCurrentUser = async () => {
 
   try {
     const response = await api.get('/users/profile');
-    return response.data.user;
+    return response.data;
   } catch (error) {
     return null;
   }

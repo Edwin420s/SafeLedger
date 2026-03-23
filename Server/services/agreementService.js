@@ -8,14 +8,31 @@ const logger = require('../utils/logger');
 async function createAgreement(data, creatorId) {
   const { lenderId, borrowerId, amount, interestRate = 5.0, penaltyRate = 2.0, dueDate, terms } = data;
 
-  // If borrowerId is a phone number, find the user
+  // Normalize phone number and find borrower
   let actualBorrowerId = borrowerId;
-  if (borrowerId.match(/^[0-9+]{10,15}$/)) {
-    const borrower = await prisma.user.findUnique({ where: { phone: borrowerId } });
+  console.log('Original borrowerId:', borrowerId);
+  
+  // Check if it's a phone number (contains only digits and optional +)
+  if (/^[0-9+]+$/.test(borrowerId)) {
+    // Normalize phone number
+    let normalizedPhone = borrowerId.replace(/\s/g, '');
+    console.log('After removing spaces:', normalizedPhone);
+    
+    if (normalizedPhone.startsWith('0') && normalizedPhone.length >= 10) {
+      normalizedPhone = '+254' + normalizedPhone.substring(1);
+      console.log('After normalization:', normalizedPhone);
+    }
+    
+    console.log('Looking for borrower with phone:', normalizedPhone);
+    const borrower = await prisma.user.findUnique({ where: { phone: normalizedPhone } });
     if (!borrower) {
+      console.log('Borrower not found with phone:', normalizedPhone);
       throw new Error('Borrower not found with this phone number');
     }
     actualBorrowerId = borrower.id;
+    console.log('Found borrower:', borrower.id);
+  } else {
+    console.log('BorrowerId is not a phone number, using as-is:', actualBorrowerId);
   }
 
   // Ensure creator is either lender or borrower

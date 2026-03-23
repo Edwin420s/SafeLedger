@@ -14,6 +14,9 @@
     "compile": "node hedera/scripts/compileContract.js",
     "deploy": "node hedera/scripts/deployContract.js"
   },
+  "prisma": {
+    "seed": "node prisma/seed.js"
+  },
   "dependencies": {
     "@hashgraph/sdk": "^2.81.0",
     "@prisma/client": "^5.19.0",

@@ -7,6 +7,7 @@ import Landing from './pages/Landing';
 import Login from './pages/Login';
 import Register from './pages/Register';
 import Agreement from './pages/Agreement';
+import AgreementDetails from './pages/AgreementDetails';
 import Profile from './pages/Profile';
 import { useUser } from './context/UserContext';
 import { Toaster } from 'react-hot-toast';
@@ -23,7 +24,7 @@ function App() {
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
           <Route path="/dashboard" element={user ? <Dashboard /> : <Navigate to="/login" />} />
-          <Route path="/agreement/:id?" element={user ? <Agreement /> : <Navigate to="/login" />} />
+          <Route path="/agreement/:id" element={user ? <AgreementDetails /> : <Navigate to="/login" />} />
           <Route path="/profile" element={user ? <Profile /> : <Navigate to="/login" />} />
         </Routes>
       </main>

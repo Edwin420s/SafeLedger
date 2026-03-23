@@ -6,6 +6,7 @@ import { getAgreements } from '../services/api';
 
 const Dashboard = () => {
   const { user } = useUser();
+  const actualUser = user?.user || user; // Handle both structures
   const [stats, setStats] = useState({
     totalAgreements: 0,
     activeAgreements: 0,
@@ -66,7 +67,7 @@ const Dashboard = () => {
             <div>
               <h1 className="text-3xl font-bold text-gray-900">Dashboard</h1>
               <p className="text-gray-600 mt-1">
-                Welcome back, {user?.name || 'User'}! 👋
+                Welcome back, {actualUser?.name || 'User'}! 👋
               </p>
             </div>
             <button

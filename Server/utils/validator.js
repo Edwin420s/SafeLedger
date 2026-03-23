@@ -2,14 +2,14 @@ const Joi = require('joi');
 
 // User registration
 const registerSchema = Joi.object({
-  phone: Joi.string().pattern(/^[0-9]{10,15}$/).required(),
+  phone: Joi.string().pattern(/^\+?[0-9]{10,15}$/).required(),
   password: Joi.string().min(6).required(),
   name: Joi.string().required(),
 });
 
 // Login
 const loginSchema = Joi.object({
-  phone: Joi.string().required(),
+  phone: Joi.string().pattern(/^\+?[0-9]{10,15}$/).required(),
   password: Joi.string().required(),
 });
 

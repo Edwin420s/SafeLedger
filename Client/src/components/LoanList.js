@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { getUserAgreements, acceptAgreement, rejectAgreement } from '../services/api';
+import { getAgreements, acceptAgreement, rejectAgreement } from '../services/api';
 import { showError, showSuccess } from './NotificationToast';
 import { useUser } from '../context/UserContext';
 
@@ -9,6 +9,7 @@ const LoanList = () => {
   const [filter, setFilter] = useState('all');
   const [sortBy, setSortBy] = useState('date');
   const { user } = useUser();
+  const actualUser = user?.user || user; // Handle both structures
 
   useEffect(() => {
     fetchAgreements();
@@ -16,7 +17,7 @@ const LoanList = () => {
 
   const fetchAgreements = async () => {
     try {
-      const data = await getUserAgreements();
+      const data = await getAgreements();
       setAgreements(data);
     } catch (err) {
       showError('Failed to load agreements.');
@@ -73,8 +74,8 @@ const LoanList = () => {
   const filteredAndSortedAgreements = agreements
     .filter(agreement => {
       if (filter === 'all') return true;
-      if (filter === 'lending') return agreement.lenderId === user.id;
-      if (filter === 'borrowing') return agreement.borrowerId === user.id;
+      if (filter === 'lending') return agreement.lenderId === actualUser.id;
+      if (filter === 'borrowing') return agreement.borrowerId === actualUser.id;
       return false;
     })
     .sort((a, b) => {
@@ -165,7 +166,7 @@ const LoanList = () => {
                   <div>
                     <div className="flex items-center space-x-3">
                       <h4 className="text-lg font-semibold text-gray-900">
-                        {agreement.lenderId === user.id ? 'Lending to' : 'Borrowing from'} {agreement.borrowerName || agreement.lenderName}
+                        {agreement.lenderId === actualUser.id ? 'Lending to' : 'Borrowing from'} {agreement.borrower?.name || agreement.lender?.name}
                       </h4>
                       {getStatusBadge(agreement.status)}
                     </div>
@@ -199,7 +200,7 @@ const LoanList = () => {
                 {/* Actions */}
                 <div className="flex items-center justify-between mt-4 pt-4 border-t border-gray-200">
                   <div className="flex space-x-2">
-                    {agreement.status === 'PENDING' && agreement.borrowerId === user.id && (
+                    {agreement.status === 'PENDING' && agreement.borrowerId === actualUser.id && (
                       <>
                         <button
                           onClick={() => handleAccept(agreement.id)}

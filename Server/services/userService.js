@@ -5,6 +5,12 @@ const { encrypt, decrypt } = require('../utils/encryption');
 const { JWT_SECRET, JWT_EXPIRE } = require('../config/env');
 
 async function registerUser(phone, password, name) {
+  // Normalize phone number
+  phone = phone.replace(/\s/g, '');
+  if (phone.startsWith('0') && phone.length === 10) {
+    phone = '+254' + phone.substring(1);
+  }
+  
   const existingUser = await prisma.user.findUnique({ where: { phone } });
   if (existingUser) {
     throw new Error('User with this phone number already exists');
@@ -36,6 +42,12 @@ async function registerUser(phone, password, name) {
 }
 
 async function loginUser(phone, password) {
+  // Normalize phone number
+  phone = phone.replace(/\s/g, '');
+  if (phone.startsWith('0') && phone.length === 10) {
+    phone = '+254' + phone.substring(1);
+  }
+  
   const user = await prisma.user.findUnique({ where: { phone } });
   if (!user) {
     throw new Error('Invalid phone number or password');

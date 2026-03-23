@@ -9,7 +9,7 @@ async function compileContract() {
   console.log('Compiling AgreementVerification.sol...');
   
   return new Promise((resolve, reject) => {
-    exec(`solc --bin ${contractPath}`, (error, stdout, stderr) => {
+    exec(`npx solc --bin ${contractPath}`, (error, stdout, stderr) => {
       if (error) {
         console.error('Compilation error:', error);
         reject(error);

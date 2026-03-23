@@ -4,9 +4,13 @@ import { showSuccess, showError } from './NotificationToast';
 import { useUser } from '../context/UserContext';
 
 const AgreementForm = ({ onAgreementCreated }) => {
-  const { user } = useUser();
+  const { user, token } = useUser();
+  const actualUser = user?.user || user; // Handle both structures
+  console.log('AgreementForm - User context:', { user, token });
+  console.log('Actual user object:', actualUser);
+  
   const [formData, setFormData] = useState({
-    lenderId: user?.id || '',
+    lenderId: actualUser?.id || '',
     borrowerId: '',
     amount: '',
     interestRate: '5.0',
@@ -18,6 +22,14 @@ const AgreementForm = ({ onAgreementCreated }) => {
   const [errors, setErrors] = useState({});
   const [showAdvanced, setShowAdvanced] = useState(false);
 
+  // Update lenderId when user changes
+  React.useEffect(() => {
+    if (actualUser?.id) {
+      setFormData(prev => ({ ...prev, lenderId: actualUser.id }));
+      console.log('Updated lenderId to:', actualUser.id);
+    }
+  }, [actualUser]);
+
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
@@ -28,11 +40,12 @@ const AgreementForm = ({ onAgreementCreated }) => {
   };
 
   const validateForm = () => {
+    console.log('=== VALIDATION START ===');
     const newErrors = {};
     
     if (!formData.borrowerId.trim()) {
       newErrors.borrowerId = 'Borrower phone number is required';
-    } else if (!/^(\+254|0)?[17]\d{8}$/.test(formData.borrowerId)) {
+    } else if (!/^(\+254|0)?[17]\d{8}$/.test(formData.borrowerId.replace(/\s/g, ''))) {
       newErrors.borrowerId = 'Please enter a valid Kenyan phone number';
     }
     
@@ -52,39 +65,55 @@ const AgreementForm = ({ onAgreementCreated }) => {
       newErrors.terms = 'Loan terms are required';
     }
     
+    console.log('Validation errors:', newErrors);
     setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
+    const isValid = Object.keys(newErrors).length === 0;
+    console.log('Is valid:', isValid);
+    console.log('=== VALIDATION END ===');
+    return isValid;
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     
+    console.log('=== FORM SUBMISSION START ===');
+    console.log('Form data:', formData);
+    console.log('User context:', { user, token });
+    console.log('Actual user:', actualUser);
+    console.log('User ID:', actualUser?.id);
+    
     if (!validateForm()) {
+      console.log('Form validation failed');
       return;
     }
+    console.log('Form validation passed');
 
     setLoading(true);
     try {
-      if (!user || !user.id) {
+      if (!actualUser || !actualUser.id) {
+        console.log('User authentication check failed - actualUser:', actualUser);
         showError('User not authenticated. Please log in again.');
         return;
       }
+      console.log('User authentication passed');
       
       const agreementData = {
         ...formData,
-        lenderId: user.id,
+        lenderId: actualUser.id,
         amount: parseFloat(formData.amount),
         interestRate: parseFloat(formData.interestRate),
         penaltyRate: parseFloat(formData.penaltyRate),
       };
       
+      console.log('Sending agreement data:', agreementData);
       const newAgreement = await createAgreement(agreementData);
+      console.log('Agreement created:', newAgreement);
       showSuccess('Agreement created and anchored on Hedera blockchain!');
       onAgreementCreated?.(newAgreement);
       
       // Reset form
       setFormData({ 
-        lenderId: user.id,
+        lenderId: actualUser.id,
         borrowerId: '', 
         amount: '',
         interestRate: '5.0',
@@ -351,7 +380,7 @@ const AgreementForm = ({ onAgreementCreated }) => {
               <>
                 <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                   <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V8C6 4 0 4 0s4 4 4v4a8 8 0 018 8z"></path>
+                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                 </svg>
                 Creating Agreement...
               </>

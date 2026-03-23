@@ -31,7 +31,7 @@ const Register = () => {
     const newErrors = {};
     
     // Name validation
-    if (!formData.name.trim()) {
+    if (!formData.name || !formData.name.trim()) {
       newErrors.name = 'Full name is required';
     } else if (formData.name.length < 2) {
       newErrors.name = 'Name must be at least 2 characters';
@@ -39,21 +39,21 @@ const Register = () => {
     
     // Phone validation
     const phoneRegex = /^(\+254|0)?[17]\d{8}$/;
-    if (!formData.phone.trim()) {
+    if (!formData.phone || !formData.phone.trim()) {
       newErrors.phone = 'Phone number is required';
     } else if (!phoneRegex.test(formData.phone)) {
       newErrors.phone = 'Please enter a valid Kenyan phone number';
     }
     
     // Password validation
-    if (!formData.password) {
+    if (!formData.password || !formData.password.trim()) {
       newErrors.password = 'Password is required';
     } else if (formData.password.length < 6) {
       newErrors.password = 'Password must be at least 6 characters';
     }
     
     // Confirm password validation
-    if (!formData.confirmPassword) {
+    if (!formData.confirmPassword || !formData.confirmPassword.trim()) {
       newErrors.confirmPassword = 'Please confirm your password';
     } else if (formData.password !== formData.confirmPassword) {
       newErrors.confirmPassword = 'Passwords do not match';
@@ -85,11 +85,22 @@ const Register = () => {
   };
 
   const handlePhoneChange = (e) => {
-    // Format phone number for Kenya
+    // Format phone number for Kenya - clean and format properly
     let value = e.target.value.replace(/\s/g, '');
-    if (value.startsWith('0') && value.length === 1) {
-      value = value.replace('0', '+254');
+    
+    // Remove any existing quotes that might cause JSON issues
+    value = value.replace(/"/g, '');
+    
+    // Convert 07xxx to +2547xxx
+    if (value.startsWith('0') && value.length >= 10) {
+      value = '+254' + value.substring(1);
     }
+    
+    // Ensure it starts with +254 if it's a Kenyan number
+    if (value.startsWith('7') && value.length === 9) {
+      value = '+254' + value;
+    }
+    
     setFormData(prev => ({ ...prev, phone: value }));
     if (errors.phone) {
       setErrors(prev => ({ ...prev, phone: '' }));
@@ -203,11 +214,11 @@ const Register = () => {
                 >
                   {showPassword ? (
                     <svg className="h-5 w-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.875 18.825A10.05 10.05 0 0012 18.825c0 0-1.896-.386-3.6-1.075L3.9 12.9c-2.28-1.55-5.555-1.55-8.35 0l-4.5 4.5c0 1.933 1.555 4.5 4.5 4.5 2.795 0 5.55-1.55 8.35l4.5 4.5c0 1.933-1.555 4.5-4.5 4.5z" />
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0zm2.8-1.68a8.96 8.96 0 11-7.6 0 8.96 8.96 0 017.6 0z" />
                     </svg>
                   ) : (
                     <svg className="h-5 w-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0zm4 8a3 3 0 11-6 0 3 3 0 016 0zM2.458 4L13.54 4a2 2 0 012 0v12a2 2 0 01-2 2H6a2 2 0 01-2-2V6a2 2 0 012-2h2.5l-1.542-4z" />
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.875 18.825A10.05 10.05 0 0012 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21" />
                     </svg>
                   )}
                 </button>
@@ -246,11 +257,11 @@ const Register = () => {
                 >
                   {showConfirmPassword ? (
                     <svg className="h-5 w-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.875 18.825A10.05 10.05 0 0012 18.825c0 0-1.896-.386-3.6-1.075L3.9 12.9c-2.28-1.55-5.555-1.55-8.35 0l-4.5 4.5c0 1.933 1.555 4.5 4.5 4.5 2.795 0 5.55-1.55 8.35l4.5 4.5c0 1.933-1.555 4.5-4.5 4.5z" />
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0zm2.8-1.68a8.96 8.96 0 11-7.6 0 8.96 8.96 0 017.6 0z" />
                     </svg>
                   ) : (
                     <svg className="h-5 w-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0zm4 8a3 3 0 11-6 0 3 3 0 016 0zM2.458 4L13.54 4a2 2 0 012 0v12a2 2 0 01-2 2H6a2 2 0 01-2-2V6a2 2 0 012-2h2.5l-1.542-4z" />
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.875 18.825A10.05 10.05 0 0012 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21" />
                     </svg>
                   )}
                 </button>
@@ -291,7 +302,7 @@ const Register = () => {
                   <>
                     <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                       <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V8C6 4 0 4 0s4 4 4v4a8 8 0 018 8z"></path>
+                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                     </svg>
                     Creating Account...
                   </>
