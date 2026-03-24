@@ -9,7 +9,7 @@ const registerSchema = Joi.object({
 
 // Login
 const loginSchema = Joi.object({
-  phone: Joi.string().pattern(/^\+?[0-9]{10,15}$/).required(),
+  phone: Joi.string().pattern(/^\+?[0-9\s]{10,15}$/).required(),
   password: Joi.string().required(),
 });
 

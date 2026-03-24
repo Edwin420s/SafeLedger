@@ -1,9 +1,11 @@
 import React, { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { getAgreements, acceptAgreement, rejectAgreement } from '../services/api';
 import { showError, showSuccess } from './NotificationToast';
 import { useUser } from '../context/UserContext';
 
 const LoanList = () => {
+  const navigate = useNavigate();
   const [agreements, setAgreements] = useState([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState('all');
@@ -219,7 +221,7 @@ const LoanList = () => {
                     
                     {agreement.status === 'ACTIVE' && (
                       <button
-                        onClick={() => window.location.href = `/agreement/${agreement.id}`}
+                        onClick={() => navigate(`/agreement/${agreement.id}`)}
                         className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors text-sm"
                       >
                         Record Payment
@@ -227,7 +229,7 @@ const LoanList = () => {
                     )}
                     
                     <button
-                      onClick={() => window.location.href = `/agreement/${agreement.id}`}
+                      onClick={() => navigate(`/agreement/${agreement.id}`)}
                       className="bg-gray-600 text-white px-4 py-2 rounded-lg hover:bg-gray-700 transition-colors text-sm"
                     >
                       View Details
@@ -236,7 +238,7 @@ const LoanList = () => {
                   
                   <div className="flex items-center space-x-2">
                     <button
-                      onClick={() => window.location.href = `/agreement/${agreement.id}`}
+                      onClick={() => navigate(`/agreement/${agreement.id}`)}
                       className="text-blue-600 hover:text-blue-700 text-sm font-medium flex items-center"
                     >
                       <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">

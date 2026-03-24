@@ -18,10 +18,14 @@ async function register(req, res, next) {
 
 async function login(req, res, next) {
   try {
-    const { error } = loginSchema.validate(req.body);
+    // Clean phone number before validation
+    const cleanedPhone = req.body.phone.replace(/\s/g, '');
+    const cleanedReqBody = { ...req.body, phone: cleanedPhone };
+    
+    const { error } = loginSchema.validate(cleanedReqBody);
     if (error) return res.status(400).json({ error: error.details[0].message });
 
-    const { phone, password } = req.body;
+    const { phone, password } = cleanedReqBody;
     const { user, token } = await loginUser(phone, password);
     res.json({ user, token });
   } catch (err) {

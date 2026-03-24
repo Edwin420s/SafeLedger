@@ -54,8 +54,11 @@ export const UserProvider = ({ children }) => {
     localStorage.removeItem('safeledger_user');
   };
 
+  // Get token from localStorage
+  const token = localStorage.getItem('safeledger_token');
+
   return (
-    <UserContext.Provider value={{ user, loading, login, logout }}>
+    <UserContext.Provider value={{ user, token, loading, login, logout }}>
       {children}
     </UserContext.Provider>
   );

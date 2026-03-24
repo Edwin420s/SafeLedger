@@ -12,6 +12,7 @@ yarn.lock
 
 # production
 /build
+/dist
 
 # misc
 .DS_Store
@@ -39,6 +40,7 @@ node_modules/
 .env
 .env.local
 .env.production
+.env.test
 
 # Logs
 logs
@@ -130,3 +132,42 @@ dump.rdb
 *.swp
 *.swo
 *~
+
+# Vercel
+.vercel
+.vercelignore
+
+# Build artifacts
+*.tgz
+*.tar.gz
+
+# Database
+*.sqlite
+*.sqlite3
+*.db
+
+# Hedera contracts
+hedera/contracts/*.bin
+hedera/contracts/*.abi
+hedera/scripts/_*
+
+# Temporary files
+tmp/
+temp/
+.tmp/
+
+# OS generated files
+Thumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+
+# Backup files
+*.bak
+*.backup
+*.old
+
+# Lock files
+*.lock
+
+# AgentCash wallet
+.agentcash/

@@ -15,10 +15,13 @@ const Login = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     
-    console.log('Login form data:', { phone, password });
+    // Clean phone number before sending
+    const cleanPhone = phone.replace(/\s/g, '').replace(/"/g, '');
+    
+    console.log('Login form data:', { phone: cleanPhone, password });
     
     // Validate phone and password before sending
-    if (!phone || !phone.trim()) {
+    if (!cleanPhone || !cleanPhone.trim()) {
       showError('Please enter your phone number');
       return;
     }
@@ -30,7 +33,7 @@ const Login = () => {
     
     setLoading(true);
     try {
-      const userData = await apiLogin({ phone, password });
+      const userData = await apiLogin({ phone: cleanPhone, password });
       login(userData);
       showSuccess('Welcome back to SafeLedger!');
       navigate('/dashboard');
