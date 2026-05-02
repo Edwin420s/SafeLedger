@@ -1,0 +1,7 @@
+-- AlterEnum
+ALTER TYPE "Status" ADD VALUE 'REJECTED';
+
+-- AlterTable
+ALTER TABLE "Agreement" ADD COLUMN     "acceptedAt" TIMESTAMP(3),
+ADD COLUMN     "interestRate" DOUBLE PRECISION NOT NULL DEFAULT 5.0,
+ADD COLUMN     "penaltyRate" DOUBLE PRECISION NOT NULL DEFAULT 2.0;
